@@ -1,3 +1,4 @@
+from django.db.migrations import serializer
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from ip2geotools.databases.noncommercial import DbIpCity
@@ -5,6 +6,9 @@ from rest_framework import status, response, request
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+#from speedtest import serializers
+from django.core import serializers
 from speedtest.models import SpeedTest
 from speedtest.serializers import STSerializers
 import speedtest
@@ -103,22 +107,9 @@ class SpeedTestView(APIView):
 
     def get(self, request):
         speedtest_instances = SpeedTest.objects.all()
-        data = []
-        for instance in speedtest_instances:
-            data.append({
-                'Ip': instance.ip,
-                'Speed': instance.Speed,
-                'Date Time': instance.DateTime,
-                'Binary Url': instance.BinaryUrl,
-                'Device Name Model': instance.DeviceNameModel,
-                'System Version': instance.SystemVersion,
-                'Device Id': instance.DeviceId,
-                'Widget Family': instance.WidgetFamily,
-                #'ip_country': instance.ip_country,
-                #'ip_city': instance.ip_city,
-                #'url': instance.url,
-            })
-        return Response(data, status=status.HTTP_200_OK)
+        data = serializers.serialize('json', speedtest_instances)
+        serializer = STSerializers(speedtest_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 """
 # def getGeoLoc(ipaddr, user):
