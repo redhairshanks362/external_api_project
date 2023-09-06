@@ -111,10 +111,10 @@ class Fetch(APIView):
             with open(hd_image_filename, "wb") as hd_file:
                 hd_file.write(hd_response.content)
 
-            # Resize the HD image to 800x800
-            hd_image = Image.open(hd_image_filename)
-            hd_image = hd_image.resize((800, 800), Image.ANTIALIAS)
-            hd_image.save(hd_image_filename)
+                # Resize the HD image
+                hd_image = Image.open(hd_image_filename)
+                hd_image = hd_image.resize((800, 800))
+                hd_image.save(hd_image_filename)
 
         # Download and save the standard image
         response = requests.get(url)
@@ -122,10 +122,10 @@ class Fetch(APIView):
             with open(standard_image_filename, "wb") as file:
                 file.write(response.content)
 
-            # Resize the standard image to 800x800
-            standard_image = Image.open(standard_image_filename)
-            standard_image = standard_image.resize((800, 800), Image.ANTIALIAS)
-            standard_image.save(standard_image_filename)
+                # Resize the standard image
+                standard_image = Image.open(standard_image_filename)
+                standard_image = standard_image.resize((800, 800))
+                standard_image.save(standard_image_filename)
 
 
 
