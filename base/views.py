@@ -128,5 +128,23 @@ class Fetch(APIView):
                 standard_image.save(standard_image_filename)
 
 
+    def post(self, request):
+        DeviceNameModel = request.data.get('Device Name Model')
+        SystemVersion = request.data.get('System Version')
+        DeviceId = request.data.get('DeviceId')
+        WidgetFamily = request.data.get('WidgetFamily')
+        image_instance = NASAApod(DeviceNameModel=DeviceNameModel, SystemVersion=SystemVersion, DeviceId=DeviceId, WidgetFamily=WidgetFamily)
+        image_instance.save()
+
+        response_data = {
+            'Device Name Model': DeviceNameModel,
+            'System Version': SystemVersion,
+            'Device Id': DeviceId,
+            'Widget Family': WidgetFamily,
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
 
 
