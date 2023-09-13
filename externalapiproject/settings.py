@@ -22,14 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 env.read_env()
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = env('SECRET_KEY')
+# SECRET_KEY = env('SECRET_KEY')
 SECRET_KEY = 'django-insecure-dpd^jcq!@&kmwtni3mpz!!^!vnruy3n#4h*fqixx@^ram6lwtf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['192.168.0.186', '127.0.0.1', '5221-219-91-170-183.ngrok-free.app']
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"] if DEBUG else ['192.168.0.186', '127.0.0.1', '5221-219-91-170-183.ngrok-free.app',
+                                             'https://5413-123-201-214-38.ngrok-free.app']
 environ.Env.read_env()
 
 
@@ -59,8 +60,9 @@ INSTALLED_APPS = [
     'pictures'
 ]
 
-#Celery Configuration
+# Celery Configuration
 from celery import Celery
+
 app = Celery('externalapiproject')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
@@ -147,18 +149,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-#env = environ.Env()
-#env.read_env()
+# env = environ.Env()
+# env.read_env()
 # print('env', env)
 """ NASA API Key"""
 NASA_API_KEY = env('NASA_API_KEY')
-#NASA_API_KEY = get_env('NASA_API_KEY')
+# NASA_API_KEY = get_env('NASA_API_KEY')
 """URL"""
-URL='https://api.nasa.gov/planetary/apod'
-PICKUP_URL='https://api.jcwyt.com/pickup'
-PICKUP2_URL='https://vinuxd.vercel.app/api/pickup'
-TV_SHOW_URL='https://quotes.alakhpc.com'
+URL = 'https://api.nasa.gov/planetary/apod'
+PICKUP_URL = 'https://api.jcwyt.com/pickup'
+PICKUP2_URL = 'https://vinuxd.vercel.app/api/pickup'
+TV_SHOW_URL = 'https://quotes.alakhpc.com'
 # URL = get_env('URL')
-#URL = env('URL')
-#PICKUP_URL = env('PICKUP_URL')
-#PICKUP_URL2 = env('PICKUP2_URL')
+# URL = env('URL')
+# PICKUP_URL = env('PICKUP_URL')
+# PICKUP_URL2 = env('PICKUP2_URL')
