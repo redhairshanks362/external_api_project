@@ -28,7 +28,7 @@ urlpatterns = [
     path('getPickup/', include('pickup.urls')),
     path('getTVQuotes/', include('tvshow.urls')),
     path('getUser/', include('user.urls')),
-    path('', include('pictures.urls')),
+    path('wallpapers/', include('pictures.urls')),
     #path('', include('speedtest.urls')),
     #path('ipad/', views.ipaddress, name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),

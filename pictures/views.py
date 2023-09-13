@@ -10,37 +10,42 @@ import os
 import random
 from django.http import HttpResponse
 
-# class ImageView(APIView):
-#     def get(self, request, image_id):
-#         try:
-#             image = Image.objects.get(pk=image_id)
-#         except Image.DoesNotExist:
-#             return Response({"error": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
-#
-#         serializer = ImageSerializer(image)
-#         return Response(serializer.data)
+class WallpaperView(APIView):
 
-def get(request):
-    image_dir = 'C:\\Users\\sweta\\Desktop\\externalapiproject\\pictures\\images'
+    def get(self, request, *args, **kwargs):
+        # Define a dictionary to map category names to their corresponding directory paths.
+        category_paths = {
+            'anime': 'C:\\Users\\sweta\\Desktop\\externalapiproject\\pictures\\images\\anime',
+            'ipl': 'C:\\Users\\sweta\\Desktop\\externalapiproject\\pictures\\images\\ipl',
+            'f1': 'C:\\Users\\sweta\\Desktop\\externalapiproject\\pictures\\images\\f1',
+            'nba': 'C:\\Users\\sweta\\Desktop\\externalapiproject\\pictures\\images\\nba',
+        }
+        category = kwargs['category']
+        print(kwargs)
 
-    try:
-        image_files = os.listdir(image_dir)
+        # Check if the requested category is valid.
+        if category not in category_paths:
+            return HttpResponse("Invalid category", status=400)
 
-        if not image_files:
-            return HttpResponse("No images found in the directory", status=404)
+        # Get the directory path for the requested category.
+        image_dir = category_paths[category]
 
+        try:
+            image_files = os.listdir(image_dir)
 
-        random_image = random.choice(image_files)
+            if not image_files:
+                return HttpResponse(f"No images found in the {category} category", status=404)
 
+            random_image = random.choice(image_files)
+            image_path = os.path.join(image_dir, random_image)
 
-        image_path = os.path.join(image_dir, random_image)
-
-
-        with open(image_path, "rb") as image_file:
-            response = HttpResponse(image_file.read(), content_type="image/jpeg")  # Adjust the content type as needed
-            return response
-    except FileNotFoundError:
-        return HttpResponse("Image not found", status=404)
+            with open(image_path, "rb") as image_file:
+                # Adjust the content type based on the image format (e.g., 'image/jpeg' for JPEG images).
+                content_type = "image/jpeg"  # You may need to determine the correct content type.
+                response = HttpResponse(image_file.read(), content_type=content_type)
+                return response
+        except FileNotFoundError:
+            return HttpResponse(f"No images found in the {category} category", status=404)
 
 
     def post(self, request):
