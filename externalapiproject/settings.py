@@ -57,15 +57,18 @@ INSTALLED_APPS = [
     'tvshow',
     'user',
     'celery',
-    'pictures'
+    'pictures',
+    'django_celery_results',
+    'django_celery_beat',
+    'numbers_api'
 ]
 
 # Celery Configuration
-from celery import Celery
+#from celery import Celery
 
-app = Celery('externalapiproject')
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks()
+#app = Celery('externalapiproject')
+#app.config_from_object('django.conf:settings', namespace='CELERY')
+#app.autodiscover_tasks()
 
 # CELERY_BROKER_URL = 'redis://localhost:6379/0'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -160,7 +163,17 @@ URL = 'https://api.nasa.gov/planetary/apod'
 PICKUP_URL = 'https://api.jcwyt.com/pickup'
 PICKUP2_URL = 'https://vinuxd.vercel.app/api/pickup'
 TV_SHOW_URL = 'https://quotes.alakhpc.com'
+NUMBER_API_URL = 'http://numbersapi.com'
 # URL = get_env('URL')
 # URL = env('URL')
 # PICKUP_URL = env('PICKUP_URL')
 # PICKUP_URL2 = env('PICKUP2_URL')
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+#This djang-db can be changed to redis
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

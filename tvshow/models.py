@@ -8,6 +8,7 @@ class TVShow(models.Model):
     # stats = models.TextField(max_length=500)
     character = models.TextField(max_length=200)
     text = models.TextField(max_length=1000)
+    short = models.TextField()
     # total = models.TextField(max_length=500)
     #number = models.TextField(max_length=500)
     # shows = models.TextField(max_length=200)
@@ -15,5 +16,10 @@ class TVShow(models.Model):
     # name = models.TextField(max_length=200)
     # quotes = models.TextField(max_length=300)
 
+class AllTvShows(models.Model):
+    shows = models.CharField(max_length=200)
     def __str__(self):
         return self.show
+
+    def __str__(self):
+        return self.name

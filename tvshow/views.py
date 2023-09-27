@@ -1,3 +1,5 @@
+import random
+
 import requests
 from django.shortcuts import render
 from rest_framework import status
@@ -9,183 +11,82 @@ from rest_framework.views import APIView
 from externalapiproject.settings import TV_SHOW_URL
 from tvshow.models import TVShow
 from tvshow.serializers import TVShowSerializers
+from django.urls import reverse, get_script_prefix
 
 
-class fetchQuotes(APIView):
-    def get(self, request, **kwargs):
-        api_url = TV_SHOW_URL
+class fetchQuotesWithLimit(APIView):
+    def get(self, request, *args,**kwargs):
+        #base_url = 'http://127.0.0.1:8000'
+        host = request.get_host()
+        base_url = f"http://{host}{get_script_prefix()}"
+        #This will retrieve the port and url at which it is running
+        #base_url = reverse('home')
         quotes = kwargs.get('quotes')
-        stats = kwargs.get('stats')
-        shows = kwargs.get('shows')
-        number = kwargs.get('number')
-        show = request.query_params.get('show')
-        short = request.query_params.get('short')
-        get_quotes_url = f"{api_url}/{quotes}"
-        get_quotes_limit_url = f"{api_url}/{quotes}/{number}"
-        get_quotes_query_url = f"{api_url}/{quotes}?show={show}&short={short}"
-        get_quotes_query_limit_url = f"{api_url}/{quotes}/{number}?show={show}&short={short}"
-        response_text = None
-
-        if get_quotes_url:
-            response = requests.get(get_quotes_url)
-            data = response.json()
-            response_text = data.get('text')
-        elif get_quotes_limit_url:
-            response = requests.get(get_quotes_limit_url)
-            data = response.json()
-            response_text = data.get('text')
-        elif get_quotes_query_url:
-            response = requests.get(get_quotes_query_url)
-            data = response.json()
-            response_text = data.get('text')
-        elif get_quotes_query_limit_url:
-            response = requests.get(get_quotes_query_limit_url)
-            data = response.json()
-            response_text = data.get('text')
-        else:
-            return Response({"error": "Invalid endpoint"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if response_text:
-            try:
-                tv_show = TVShow.objects.get(text=response_text)
-                serializer = TVShowSerializers(tv_show)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except TVShow.DoesNotExist:
-                serializer = TVShowSerializers(data=data)
-                if serializer.is_valid():
-                    tv_show = serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({"error": "Invalid response from the external API"}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error": "Invalid endpoint2"}, status=status.HTTP_400_BAD_REQUEST)
-
-        '''
-        #quotes = kwargs.get('quotes')
         #stats = kwargs.get('stats')
         #shows = kwargs.get('shows')
         number = kwargs.get('number')
-        print('number', number)
+        show = request.query_params.get('show')
+        short = request.query_params.get('short')
+        get_quotes_limit_url = f"{base_url}/{quotes}/{number}"
+        get_quotes_query_limit_url = f"{base_url}/{quotes}/{number}?show={show}&short={short}"
+        response_text = None
+        #Working
+        if show is None and short is None:
+            number = kwargs.get('number')
+            try:
+                number = int(number)
+            except ValueError:
+                if number <= 0:
+                    return Response({"error": "Number must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # show = request.query_params.get('show')
-        # short = request.query_params.get('short')
-        #get_quotes_stats_url = f'{api_url}/{quotes}/{stats}'
-        #get_quotes_show_url = f'{api_url}/{quotes}/{shows}'
-        if number is None:
-            get_specific_url = f'{api_url}/quotes'
-            data = requests.get(get_specific_url)
-            print(data)
-            print(data.status_code)
-            print(data.json())
-        else:
-            get_specific_url = f'{api_url}/quotes/{number}'
-            data = requests.get(get_specific_url)
-            print(data)
-            print(data.status_code)
-            print(data.json())
-        # get_specific_with_limit_url = f'{api_url}/{quotes}/{number}?show={show}&short={short}'
-        #print('get_quotes_stats_url',get_quotes_stats_url)
-        #print('get_quotes_show_url',get_quotes_show_url)
-        #print('get_specific_url',get_specific_url)
-        #print('get_specific_with_limit_url',get_specific_with_limit_url)
+            response_data_list = []
 
-        
-        if quotes and stats:
-            if not quotes or stats:
-                return Response({"error": "Quotes or States Path parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-            get_quotes_stats_url = f'{api_url}/{quotes}/{stats}'
-            response = requests.get(get_quotes_stats_url)
-            data = response.json()
-            print('data of get quotes stats', data)
-        elif quotes and shows:
-            if not quotes or shows:
-                return Response({"error": "Quotes or States Path parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-            get_quotes_show_url = f'{api_url}/{quotes}/{shows}'
-            response = requests.get(get_quotes_show_url)
-            data = response.json()
-            print('data of get quotes shows', data)
-            shows_list = data.get('shows', [])
-            shows_str = ', '.join(shows_list)
-            '''
-        #if text:
-        # if endpoint in ['quotes-query', 'quotes-query-limit', 'quotes', 'quotes-limit']:
-        #     try:
-        #         tv_show = TVShow.objects.get(text=text)  # Assuming "text" is the unique field
-        #         serializer = TVShowSerializers(tv_show)
-        #         return Response(serializer.data, status=status.HTTP_200_OK)
-        #     except TVShow.DoesNotExist:
-        #
-        #         if endpoint == 'quotes-query':
-        #             #if not show or short:
-        #             #return Response({"error": "Quotes or States Query parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-        #             get_specific_url = f'{api_url}/{endpoint}?show={show}&short={short}'
-        #             response = requests.get(get_specific_url)
-        #             data = response.json()
-        #             print('data of get specific', data)
-        #         elif endpoint == 'quotes-query-limit':
-        #             #if not number:
-        #             #return Response({"error": "Number Path parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-        #             get_specific_with_limit_url = f'{api_url}/{endpoint}?show={show}&short={short}'
-        #             response = requests.get(get_specific_with_limit_url)
-        #             data = response.json()
-        #             print('data of get specific limit', data)
-        #         elif endpoint == 'quotes':
-        #             #if not quotes:
-        #             #return Response({"error": "Quotes Path Parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-        #             get_just_quotes_url = f'{api_url}/{endpoint}'
-        #             response = requests.get(get_just_quotes_url)
-        #             data = response.json()
-        #             print('data', data)
-        #         elif endpoint == 'quotes-limit':
-        #             #if not quotes or number:
-        #             #return Response({"error": "Quotes or Number Path parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
-        #             get_just_quotes_with_limit_url = f'{api_url}/{endpoint}/{number}'
-        #             response = requests.get(get_just_quotes_with_limit_url)
-        #             data = response.json()
-        #             print('data', data)
-        #         else:
-        #             return Response({"error": "Invalid endpoint"}, status=status.HTTP_400_BAD_REQUEST)
-        #         serializer = TVShowSerializers(data)
-        #         if serializer.is_valid():
-        #             tv_show = serializer.save()
-        '''
-        else:
-            api_url = TV_SHOW_URL
-            response = requests.get(api_url)
-            data = response.json()
-            print('just the data', data)
-        '''
-        #return Response('serializer.data', status=status.HTTP_200_OK)
-        '''
-        response = requests.get(api_url)
-        data = response.json()
-        return Response(data, status=status.HTTP_200_OK)
-        #if url =
-    '''
+            # Loop to generate the specified number of responses
+            for i in range(number):
+                print('i',i)
+                random_tv_show = random.choice(TVShow.objects.all())
 
-    '''
-    def get_quotes_stats(self, url):
-        #GET /quotes/stats
-        response = requests.get(url)
-        return response
+                response_data = {
+                    "show": random_tv_show.show,
+                    "character": random_tv_show.character,
+                    "text": random_tv_show.text,
+                }
+                response_data_list.append(response_data)
 
-    def get_quotes_show(self,url):
-        # GET / quotes / shows
-        response = requests.get(url)
-        return response
+            return Response(response_data_list, status=status.HTTP_200_OK)
+        if get_quotes_query_limit_url:
+            show = request.query_params.get('show')
+            print('show', show)
+            short = request.query_params.get('short')
+            number = kwargs.get('number')
+            if not show or not short:
+                return Response({"error": "Both Show and short parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                number = int(number)
+            except ValueError:
+                return Response({"error": "Invalid 'number' parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_specific(self,url):
-        #GET /quotes?show={show}&short={short}
-        response = requests.get(url)
-        return response
+            if number <= 0:
+                return Response({"error": "Invalid 'number' parameter, must be greater than zero"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_specific_with_limit(self,url):
-        #Max of number quotes at a time.
-        response = requests.get(url)
-        return response
-    '''
+            try:
+                quotes = TVShow.objects.filter(show=show, short=short)
+                if not quotes.exists():
+                    return Response({"error": f"No quotes found for show='{show}' and short='{short}'"}, status=status.HTTP_404_NOT_FOUND)
+
+                # Randomly select 'number' quotes from the filtered queryset
+                selected_quotes = random.sample(list(quotes), number)
+
+                serializer = TVShowSerializers(selected_quotes, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except TVShow.DoesNotExist:
+                return Response({"error": "TV show does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #else:
+        #This is working but when I add a random show name it shows 3 from whatever tv show is available in the db
+        #Also for short part it is not showing me anything specific for short=false
+        #Not working
+
+
 
     def post(self, request):
         DeviceNameModel = request.data.get('Device Name Model')
@@ -203,3 +104,57 @@ class fetchQuotes(APIView):
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+class fetchQuotes(APIView):
+    def get(self, request, *args,**kwargs):
+        host = request.get_host()
+        base_url = f"http://{host}{get_script_prefix()}"
+        #base_url = 'http://127.0.0.1:8000'
+        #This will retrieve the port and url at which it is running
+        #base_url = reverse('home')
+        quotes = kwargs.get('quotes')
+        print('quotes', quotes)
+        #stats = kwargs.get('stats')
+        #shows = kwargs.get('shows')
+        #number = kwargs.get('number')
+        show = request.query_params.get('show')
+        short = request.query_params.get('short')
+        print(show, short)
+        get_quotes_url = f"{base_url}/{quotes}"
+        get_quotes_query_url = f"{base_url}/{quotes}?show={show}&short={short}"
+        print(get_quotes_url, get_quotes_query_url)
+        #Working
+        if short is None and show is None:
+            print('kwargs',kwargs)
+            print('args',args)
+            random_tv_show = random.choice(TVShow.objects.all())
+
+            # Prepare the response data with show, character, and text
+            response_data = {
+                "show": random_tv_show.show,
+                "character": random_tv_show.character,
+                "text": random_tv_show.text,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+    #Working
+        else:
+            show = request.query_params.get('show')
+            short = request.query_params.get('short')
+            print(show, short)
+            if not show or not short:
+                return Response({"error": "Both Show and short parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                # tv_show = TVShow.objects.get(show=show)
+                quotes = TVShow.objects.filter(show=show, short=short)
+                if quotes.exists():
+                    random_quote = random.choice(quotes)
+                    serializer = TVShowSerializers(random_quote)
+
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except TVShow.DoesNotExist:
+                return Response({"error": "Data for the given show does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+            except ValueError:
+                return Response({"error": "Invalid show or short value"}, status=status.HTTP_400_BAD_REQUEST)

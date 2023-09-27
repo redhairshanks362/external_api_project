@@ -13,8 +13,8 @@ def upload_image(instance, filename):
 
 class NASAApod(models.Model):
     #copyright = models.CharField(null=True, max_length=200)
-    date = models.DateField(auto_now_add=True)
-    explanation = models.TextField(null=True,)
+    date = models.DateField()
+    explanation = models.TextField(null=True)
 
     hdurl = models.URLField()
     hd_image = models.ImageField(null=True)

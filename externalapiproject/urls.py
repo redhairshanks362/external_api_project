@@ -19,6 +19,7 @@ from django.urls import path, include
 from tvshow.views import fetchQuotes
 
 from speedtest import views
+from numbers_api import urls
 #from user import views
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     path('getTVQuotes/', include('tvshow.urls')),
     path('getUser/', include('user.urls')),
     path('wallpapers/', include('pictures.urls')),
+    path('factoftheDay/', include('numbers_api.urls')),
     #path('', include('speedtest.urls')),
     #path('ipad/', views.ipaddress, name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),
