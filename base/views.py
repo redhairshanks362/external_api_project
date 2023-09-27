@@ -25,75 +25,28 @@ import requests
 
 class Fetch(APIView):
     def get(self, request, **kwargs):
-        date = request.query_params.get('date')  # Get the date from query parameter
-        print('Created at', date)
-        if not date:
+        date_param = request.query_params.get('date')  # Get the date from query parameter
+
+        if not date_param:
             return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-        #Adding validation for date the data on NASA API is between June 16 1995 to Aug 14 2023 (this date becomes current date so check functionallity
-            valid_date = datetime.strptime(date, '%m/%d/%Y').date()
-            minimum_date = date(1995, 6, 3)
-            if valid_date > minimum_date:
-                return Response({"success": "Date parameter is greater than minimum date"})
-            else:
-                return Response({"error" : "Date must be greater than Jun 16, 1995"}, status=status.HTTP_409_CONFLICT)
-        #Check if data for this given data already exist in db
+
         try:
-            #This below line is some what equal to GSPVO.getlompPk();
-            apod_instance = NASAApod.objects.get(date=date)
+            valid_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+            minimum_date = date(1995, 6, 16)
+
+            if valid_date < minimum_date:
+                return Response({"error": "Date must be greater than Jun 16, 1995"}, status=status.HTTP_409_CONFLICT)
+
+            apod_instance = NASAApod.objects.get(date=valid_date)
             serializer = ApodSerializer(apod_instance)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         except NASAApod.DoesNotExist:
-            #This data is not present in the db so go ahead and call the API
-            #pass
+            return Response({"error": "Data for the given date does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-            api_key = NASA_API_KEY
-            # url = f'https://api.nasa.gov/planetary/apod?api_key={api_key}'
-            base_url = URL
-            print('APIKEY', api_key)
-            print('Base Url', base_url)
-            url = f'{base_url}?api_key={api_key}&date={date}'
-            print('Final URl', url)
-            '''
-            api_key = 'cBNZnba1ktUVkqnXv1qrOfgfbWqM2XgvdEpwBc8e'
-            url = f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}'
-            '''
-
-            response = requests.get(url)
-            data = response.json()
-            print('data', data)
-            print('status code', response.status_code)
-            if 'code' in data and data['code'] == 400:
-                return Response({"error": "No data available"}, status=status.HTTP_404_NOT_FOUND)
-
-            hdurl = data.get('hdurl')
-            url = data.get('url')
-
-            self.save_images(date, hdurl, url)
-
-
-            #To download and save the HD image
-            # hd_image = self.download_and_resize_image(hdurl, (800, 800))
-            # standard_image = self.download_and_resize_image(url, (800, 800))
-            hd_image = "static/hd_image.jpg"
-            image = "static/standard_image.jpg"
-            #hd_image =
-            serializer = ApodSerializer(data=data)
-            if serializer.is_valid():
-                apod_instance = serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # def download_and_resize_image(self, image_url, size):
-    #     response = requests.get(image_url)
-    #     response.raise_for_status()
-    #     image_data = response.content
-    #
-    #     image = Image.open(io.BytesIO(image_data))
-    #     image = image.resize(size, Image.ANTIALIAS)
-    #
-    #     return image
-
-    #
+        except ValueError:
+            return Response({"error": "Invalid date format. Please use 'YYYY-MM-DD' format."}, status=status.HTTP_400_BAD_REQUEST)
 
     def save_images(self, date, hdurl, url):
         # Create a directory structure based on the date

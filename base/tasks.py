@@ -24,7 +24,7 @@ def fetch_and_save_nasa_data():
     base_url = URL
     api_key = NASA_API_KEY
 
-    start_date = date(2002,1,4)
+    start_date = date(2002,1,8)
     #print('startdate', start_date)
     #end_date = date.today()
     end_date = date(2003,6,16)

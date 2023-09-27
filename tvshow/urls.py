@@ -9,7 +9,7 @@ from speedtest import views
 #from speedtest.views import Demo
 #from speedtest.views import get_geo_location
 from speedtest.views import SpeedTestView
-from tvshow.views import fetchQuotes
+from tvshow.views import fetchQuotes, fetchQuotesWithLimit
 
 urlpatterns = [
     path('', fetchQuotes.as_view()),
@@ -18,9 +18,9 @@ urlpatterns = [
     #path('<str:quotes>/<int:number>', fetchQuotes.as_view(), name='quotes-limit'),
     #path('<str:quotes>/', fetchQuotes.as_view(), name='quotes-query')
     path('<str:quotes>/', fetchQuotes.as_view(), name='quotes'),
-    path('<str:quotes>/<int:number>', fetchQuotes.as_view(), name='quotes-limit'),
+    path('<str:quotes>/<int:number>', fetchQuotesWithLimit.as_view(), name='quotes-limit'),
     path('<str:quotes>/', fetchQuotes.as_view(), name='quotes-query'),
-    path('<str:quotes>/<int:number>', fetchQuotes.as_view(), name='quotes-query-limit'),
+    path('<str:quotes>/<int:number>', fetchQuotesWithLimit.as_view(), name='quotes-query-limit'),
 
     #  with query parameters
     # path('quotes/', fetchQuotes.as_view(), name='quotes'),
