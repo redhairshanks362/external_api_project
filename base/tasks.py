@@ -24,10 +24,10 @@ def fetch_and_save_nasa_data():
     base_url = URL
     api_key = NASA_API_KEY
 
-    start_date = date(2002,1,8)
+    start_date = date(1995,6,16)
     #print('startdate', start_date)
-    #end_date = date.today()
-    end_date = date(2003,6,16)
+    end_date = date.today()
+    #end_date = date(2023,9,29)
     #print('enddate', end_date)
 
     date_format = '%Y-%m-%d'
@@ -42,6 +42,7 @@ def fetch_and_save_nasa_data():
         #response_date = data.get('date')
 
         if not NASAApod.objects.filter(date=current_date).exists():
+            print(f"The data for {current_date} doesn't exist so saving it in db")
             print('url',url)
             response = requests.get(url)
             #print('API Response', response)
@@ -76,9 +77,14 @@ def fetch_and_save_nasa_data():
             except serializers.ValidationError as e:
                 print(e.detail)
                 # response.data = e.detail
+        #Uncomment this after fetching data is complete
+        else:
+            print(f"The data for {current_date} exists so skipping the date and moving to the next date")
+            current_date += timedelta(days=1)
+            continue
 
         current_date += timedelta(days=1)
-        time.sleep(500)
+        #time.sleep(100)
 
 
 
