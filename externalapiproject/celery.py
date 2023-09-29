@@ -25,28 +25,28 @@ app.conf.beat_schedule = {
 },
 'fetch_and_save_nasa_data' : {
         'task': 'base.tasks.fetch_and_save_nasa_data',
-        'schedule': crontab(minute='*/30')
+        'schedule': crontab(minute='*/20')
 },
 'fetch_and_save_date_specific_data':{
         'task': 'numbers_api.tasks.fetch_and_save_date_specific_data',
-        'schedule': crontab(minute='*/7')
+        'schedule': crontab(minute='*/20')
 },
 'fetch_and_save_quotes_query': {
         'task': 'tvshow.tasks.fetch_and_save_quotes_query',
-        'schedule': crontab(minute='*/10')
+        'schedule': crontab(minute='*/5')
 },
 'fetch_and_save_random_quotes': {
         'task': 'tvshow.tasks.fetch_and_save_random_quotes',
         #minute='*/30'
-        'schedule': crontab(minute='*/30')
+        'schedule': crontab(minute='*/2')
 },
 'fetch_and_save_maximum_quotes_at_once': {
         'task': 'tvshow.tasks.fetch_and_save_maximum_quotes_at_once',
-        'schedule': crontab(minute='*/40')
+        'schedule': crontab(minute='*/3')
 },
 'fetch_and_save_quotes_query_limit': {
         'task': 'tvshow.tasks.fetch_and_save_quotes_query_limit',
-        'schedule': crontab(minute='*/15')
+        'schedule': crontab(minute='*/8')
 },
 }
 

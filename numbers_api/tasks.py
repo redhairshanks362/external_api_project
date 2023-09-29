@@ -27,8 +27,8 @@ def fetch_and_save_date_specific_data():
             if response.status_code == 200:
                 try:
                     fact_text = response.text
-                    print('response', response)
-                    print('url', url)
+                    #print('response', response)
+                    #print('url', url)
 
                     #date_str =
                     match = re.search(r'(\w+)\s(\d+)(?:st|nd|rd|th)', fact_text)
