@@ -26,6 +26,7 @@ class NumberAPI(APIView):
         os_version = request.data.get('os_version')
         device_id = request.data.get('device_id')
         widget_family = request.data.get('widget_family')
+        #H
 
         number_api_url = f"{base_url}/factoftheDay/{month}/{day}/date"
 

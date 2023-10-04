@@ -7,7 +7,7 @@ from .scrapers import scraper
 from .serializers import WordSerializers
 
 URL = "https://www.shabdkosh.com/word-of-the-day/english-hindi/"
-
+#H
 @shared_task
 def initiate_web_scraping():
     scraped_data = scraper(URL)

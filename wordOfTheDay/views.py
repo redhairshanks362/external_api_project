@@ -85,7 +85,7 @@ class wordOfTheDay(APIView):
             }
 
             existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
+            #H
             with transaction.atomic():
                 if existing_device_id:
                     if existing_device_id.WordOftheDayCount is not None:

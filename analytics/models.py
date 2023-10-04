@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+# Create your models here.#H
 class DeviceAnalytics(models.Model):
     widgets = (
         ('small', 'small'),

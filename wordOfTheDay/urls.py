@@ -4,4 +4,5 @@ from wordOfTheDay.views import wordOfTheDay
 
 urlpatterns = [
     path('', wordOfTheDay.as_view()),
+    #H
 ]

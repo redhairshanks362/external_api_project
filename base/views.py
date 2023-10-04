@@ -26,7 +26,7 @@ import requests
 #from speedtest.views import Fetch
 #from speedtest.views import Demo
 
-
+#H
 class Fetch(APIView):
     def post(self, request, **kwargs):
         '''

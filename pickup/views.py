@@ -61,6 +61,7 @@ class Rizz(APIView):
     #Analytics data from all endpoints will go in this model
 
     #pickup_count = 0;
+    #H
 
     def post(self, request):
         device_type = request.data.get('device_type')

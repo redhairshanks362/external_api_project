@@ -68,6 +68,7 @@ def ipaddress(request):
 
     return Response(response_data, status=status.HTTP_201_CREATED)\
 '''
+#H
 
 
 class SpeedTestView(APIView):

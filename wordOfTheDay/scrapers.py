@@ -2,7 +2,7 @@ from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
-
+#H
 def scraper(url):
     #url = "https://www.shabdkosh.com/word-of-the-day/english-hindi/"
     html = requests.get(url)
