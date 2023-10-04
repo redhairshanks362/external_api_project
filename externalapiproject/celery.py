@@ -23,17 +23,21 @@ app.conf.beat_schedule = {
         'task': 'pickup.tasks.fetch_and_save_pickup_lines',
         'schedule': crontab(hour='*/1',minute='15')
 },
+'initiate_web_scraping': {
+        'task': 'wordOfTheDay.tasks.initiate_web_scraping',
+        'schedule': crontab(hour='*/5')
+},
 'fetch_and_save_nasa_data' : {
         'task': 'base.tasks.fetch_and_save_nasa_data',
-        'schedule': crontab(minute='*/20')
+        'schedule': crontab(minute='*/5')
 },
 'fetch_and_save_date_specific_data':{
         'task': 'numbers_api.tasks.fetch_and_save_date_specific_data',
-        'schedule': crontab(minute='*/20')
+        'schedule': crontab(minute='*/10')
 },
 'fetch_and_save_quotes_query': {
         'task': 'tvshow.tasks.fetch_and_save_quotes_query',
-        'schedule': crontab(minute='*/5')
+        'schedule': crontab(minute='*/10')
 },
 'fetch_and_save_random_quotes': {
         'task': 'tvshow.tasks.fetch_and_save_random_quotes',

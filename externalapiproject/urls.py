@@ -24,13 +24,14 @@ from numbers_api import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('getNASA/', include('base.urls')),
+    path('getNASA', include('base.urls')),
     path('speed_test/', include('speedtest.urls')),
     path('getPickup/', include('pickup.urls')),
     path('getTVQuotes/', include('tvshow.urls')),
     path('getUser/', include('user.urls')),
     path('wallpapers/', include('pictures.urls')),
     path('factoftheDay/', include('numbers_api.urls')),
+    path('wordOftheDay/', include('wordOfTheDay.urls')),
     #path('', include('speedtest.urls')),
     #path('ipad/', views.ipaddress, name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),
