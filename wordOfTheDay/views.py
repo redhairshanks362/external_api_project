@@ -1,34 +1,28 @@
-from random import choice
-
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import render
 from ip2geotools.databases.noncommercial import DbIpCity
 from rest_framework.views import APIView
-from django.urls import reverse, get_script_prefix
-from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import status
 
 from analytics.models import DeviceAnalytics
-from numbers_api.models import Number
-from numbers_api.serializers import NumberSerializer
+from wordOfTheDay import serializers
+from wordOfTheDay.models import WordModel
+from wordOfTheDay.serializers import WordSerializers
+from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
 
 
 # Create your views here.
-
-class NumberAPI(APIView):
-    def post(self, request,**kwargs):
-        day = kwargs.get('day')
-        month = kwargs.get('month')
-        host = request.get_host()
-        base_url = f"http://{host}{get_script_prefix()}"
+class wordOfTheDay(APIView):
+    def post(self, request, **kwargs):
+        date_param = request.query_params.get('date')
         device_type = request.data.get('device_type')
         os_version = request.data.get('os_version')
         device_id = request.data.get('device_id')
         widget_family = request.data.get('widget_family')
-        #H
-
-        number_api_url = f"{base_url}/factoftheDay/{month}/{day}/date"
 
         if device_type is not None and os_version is not None and device_id is not None and widget_family is not None:
             device_analytics = {
@@ -42,11 +36,11 @@ class NumberAPI(APIView):
 
             with transaction.atomic():
                 if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
+                    if existing_device_id.WordOftheDayCount is not None:
+                        existing_device_id.WordOftheDayCount += 1
                         existing_device_id.save()
                     else:
-                        existing_device_id.FactofTheDayCount = 1
+                        existing_device_id.WordOftheDayCount = 1
                         existing_device_id.save()
                     if existing_device_id.widget_family:
                         existing_widget_family_list = existing_device_id.widget_family.split(',')
@@ -60,17 +54,25 @@ class NumberAPI(APIView):
                     device_analytics = DeviceAnalytics(**device_analytics)
                     device_analytics.save()
 
-            if not (1 <= month <= 12) or not (1 <= day <= 31):
-                return Response({"error": "Invalid month or date"}, status=status.HTTP_400_BAD_REQUEST)
+            if not date_param:
+                return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            records = Number.objects.filter(month=month, day=day)
-            if records:
-                # Randomly select one record from the filtered queryset.
-                fact_text = choice(records).fact_text
-                #serializer = NumberSerializer(fact_text)
-                return HttpResponse(fact_text, content_type="text/plain")
-            else:
-                return Response({"error": "Data for the given month and date does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            try:
+                valid_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+
+                if valid_date:
+
+                    word_instance = WordModel.objects.get(date=valid_date)
+                    serializer = WordSerializers(word_instance)
+
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except WordModel.DoesNotExist:
+                return Response({"error": "Data for the given date does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+            except ValueError:
+                return Response({"error": "Invalid date format. Please use 'YYYY-MM-DD' format."}, status=status.HTTP_400_BAD_REQUEST)
+
         else:
             ip_address = request.META.get('REMOTE_ADDR')
             Location = DbIpCity.get(ip_address, api_key='free')
@@ -83,14 +85,14 @@ class NumberAPI(APIView):
             }
 
             existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
+            #H
             with transaction.atomic():
                 if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
+                    if existing_device_id.WordOftheDayCount is not None:
+                        existing_device_id.WordOftheDayCount += 1
                         existing_device_id.save()
                     else:
-                        existing_device_id.FactofTheDayCount = 1
+                        existing_device_id.WordOftheDayCount = 1
                         existing_device_id.save()
                     if existing_device_id.widget_family:
                         existing_widget_family_list = existing_device_id.widget_family.split(',')
@@ -103,26 +105,22 @@ class NumberAPI(APIView):
                 else:
                     device_analytics = DeviceAnalytics(**device_analytics)
                     device_analytics.save()
-            if not (1 <= month <= 12) or not (1 <= day <= 31):
-                return Response({"error": "Invalid month or date"}, status=status.HTTP_400_BAD_REQUEST)
 
-            records = Number.objects.filter(month=month, day=day)
-            if records:
-                fact_text = choice(records).fact_text
-                #serializer = NumberSerializer(fact_text)
-                return HttpResponse(fact_text, content_type="text/plain")
-            else:
-                return Response({"error": "Data for the given month and date does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            if not date_param:
+                return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+            try:
+                valid_date = datetime.strptime(date_param, '%Y-%m-%d').date()
 
+                if valid_date:
 
+                    word_instance = WordModel.objects.get(date=valid_date)
+                    serializer = WordSerializers(word_instance)
 
+                    return Response(serializer.data, status=status.HTTP_200_OK)
 
+            except WordModel.DoesNotExist:
+                return Response({"error": "Data for the given date does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
-
-
-
+            except ValueError:
+                return Response({"error": "Invalid date format. Please use 'YYYY-MM-DD' format."}, status=status.HTTP_400_BAD_REQUEST)

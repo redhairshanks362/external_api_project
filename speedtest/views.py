@@ -1,4 +1,6 @@
+from django.db import transaction
 from django.db.migrations import serializer
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from ip2geotools.databases.noncommercial import DbIpCity
@@ -9,13 +11,15 @@ from rest_framework.views import APIView
 
 #from speedtest import serializers
 from django.core import serializers
+
+from analytics.models import DeviceAnalytics
 from speedtest.models import SpeedTest
 from speedtest.serializers import STSerializers
 import speedtest
 
 
 # Create your views here.
-
+'''
 def get_client_ip(request):
     user_ip = request.META.get('HTTP_X_FORWARDED_FOR')
     if user_ip:
@@ -41,6 +45,7 @@ def get_network_ping():
 
     ping_time = st.results.ping
     return ping_time
+'''
 
 
 
@@ -63,22 +68,22 @@ def ipaddress(request):
 
     return Response(response_data, status=status.HTTP_201_CREATED)\
 '''
+#H
 
 
 class SpeedTestView(APIView):
+    '''
     #Usually in java we used to write @GetMapping , @PostMapping , @PutMapping , @DeleteMapping
     #Over here whenever we use APIView library we can keep name of the function under class based view aqs post put and get this will be helpful for
     #platforms like postman to underdtand what are we doing
     #And in urls.py only the class based view is called its not like we have called each method over there
+    '''
     def post(self, request):
-        ip = get_client_ip(request)
-        Speed = request.data.get('Speed')
-        DateTime = request.data.get('DateTime')
-        BinaryUrl = request.data.get('BinaryUrl')
-        DeviceNameModel = request.data.get('Device Name Model')
-        SystemVersion = request.data.get('System Version')
-        DeviceId = request.data.get('DeviceId')
-        WidgetFamily = request.data.get('WidgetFamily')
+        device_type = request.data.get('device_type')
+        os_version = request.data.get('os_version')
+        device_id = request.data.get('device_id')
+        widget_family = request.data.get('widget_family')
+        '''
         #Add these later
         #ISP = request.data.get('ISP')
         #Upload_Speed = request.data.get('Upload_Speed')
@@ -86,23 +91,70 @@ class SpeedTestView(APIView):
         #Server = request.data.get('Server')
         #ConnectionType = request.data.get('ConnectionType')
         #Add device id and widget family
-        # ipaddr = ipaddress(request)
-        # ip_model_instance = SpeedTest.objects.get(ip=ip)
-        ip_model_instance = SpeedTest(ip=ip, Speed=Speed, DateTime=DateTime, BinaryUrl=BinaryUrl, DeviceNameModel=DeviceNameModel, SystemVersion=SystemVersion, DeviceId=DeviceId, WidgetFamily=WidgetFamily)
-        ip_model_instance.save()
+        '''
+        if device_type is not None and os_version is not None and device_id is not None and widget_family is not None:
+            device_analytics = {
+                'device_type' : device_type,
+                'os_version' : os_version,
+                'device_id' : device_id,
+                'widget_family' : widget_family,
+            }
 
-        response_data = {
-            'Ip': ip,
-            'Speed': Speed,
-            'Date Time': DateTime,
-            'Binary URL': BinaryUrl,
-            'Device Name Model': DeviceNameModel,
-            'System Version': SystemVersion,
-            'Device Id': DeviceId,
-            'Widget Family': WidgetFamily,
-        }
+            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
 
-        return Response(response_data, status=status.HTTP_201_CREATED)
+            with transaction.atomic():
+                if existing_device_id:
+                    if existing_device_id.SpeedTestCount is not None:
+                        existing_device_id.SpeedTestCount += 1
+                        existing_device_id.save()
+                    else:
+                        existing_device_id.SpeedTestCount = 1
+                        existing_device_id.save()
+                    if existing_device_id.widget_family:
+                        existing_widget_family_list = existing_device_id.widget_family.split(',')
+                        if widget_family not in existing_widget_family_list:
+                            existing_device_id.widget_family += f',{widget_family}'
+                            existing_device_id.save()
+                    else:
+                        existing_device_id.widget_family = widget_family
+                        existing_device_id.save()
+                else:
+                    device_analytics = DeviceAnalytics(**device_analytics)
+                    device_analytics.save()
+        else:
+            ip_address = request.META.get('REMOTE_ADDR')
+            Location = DbIpCity.get(ip_address, api_key='free')
+            city = Location.city
+            country = Location.country
+            device_analytics = {
+                'ip' : ip_address,
+                'city' : city,
+                'country' : country,
+            }
+
+            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+
+            with transaction.atomic():
+                if existing_device_id:
+                    if existing_device_id.SpeedTestCount is not None:
+                        existing_device_id.SpeedTestCount += 1
+                        existing_device_id.save()
+                    else:
+                        existing_device_id.SpeedTestCount = 1
+                        existing_device_id.save()
+                    if existing_device_id.widget_family:
+                        existing_widget_family_list = existing_device_id.widget_family.split(',')
+                        if widget_family not in existing_widget_family_list:
+                            existing_device_id.widget_family += f',{widget_family}'
+                            existing_device_id.save()
+                    else:
+                        existing_device_id.widget_family = widget_family
+                        existing_device_id.save()
+                else:
+                    device_analytics = DeviceAnalytics(**device_analytics)
+                    device_analytics.save()
+
+        return JsonResponse(device_analytics, status=status.HTTP_201_CREATED)
 
 
     def get(self, request):

@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'pictures',
     'django_celery_results',
     'django_celery_beat',
-    'numbers_api'
+    'numbers_api',
+    'wordOfTheDay',
 ]
 
 # Celery Configuration
@@ -137,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -157,6 +158,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # print('env', env)
 """ NASA API Key"""
 NASA_API_KEY = env('NASA_API_KEY')
+NASA_API_KEY2 = 'PQ6avKMSg0FxMd26zWmIQvKf6y4fHd950T8E3QLs'
+
 # NASA_API_KEY = get_env('NASA_API_KEY')
 """URL"""
 URL = 'https://api.nasa.gov/planetary/apod'
