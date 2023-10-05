@@ -153,7 +153,7 @@ def fetch_and_save_nasa_data():
                 print(e.detail)
 
         current_date += timedelta(days=1)
-        time.sleep(5)
+        time.sleep(500)
 
 
 

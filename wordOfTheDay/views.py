@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.shortcuts import render
+from django.utils import timezone
 from ip2geotools.databases.noncommercial import DbIpCity
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,7 +10,7 @@ from analytics.models import DeviceAnalytics
 from wordOfTheDay import serializers
 from wordOfTheDay.models import WordModel
 from wordOfTheDay.serializers import WordSerializers
-from datetime import datetime
+from datetime import datetime, date
 
 import requests
 from bs4 import BeautifulSoup
@@ -54,11 +55,10 @@ class wordOfTheDay(APIView):
                     device_analytics = DeviceAnalytics(**device_analytics)
                     device_analytics.save()
 
-            if not date_param:
-                return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-
             try:
-                valid_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+                current_date = date.today()
+                date_string = str(current_date)
+                valid_date = datetime.strptime(date_string, '%Y-%m-%d').date()
 
                 if valid_date:
 
@@ -106,11 +106,10 @@ class wordOfTheDay(APIView):
                     device_analytics = DeviceAnalytics(**device_analytics)
                     device_analytics.save()
 
-            if not date_param:
-                return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-
             try:
-                valid_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+                current_date = date.today()
+                date_string = str(current_date)
+                valid_date = datetime.strptime(date_string, '%Y-%m-%d').date()
 
                 if valid_date:
 

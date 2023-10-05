@@ -1,5 +1,8 @@
 from django.db import models
 
+from pickup.models import PickupData
+
+
 # Create your models here.#H
 class DeviceAnalytics(models.Model):
     widgets = (
@@ -16,7 +19,7 @@ class DeviceAnalytics(models.Model):
         ('mac','mac'),
     )
 
-    device_id = models.UUIDField(null=True)
+    device_id = models.UUIDField(null=True, unique=True)
     widget_family = models.CharField(max_length=1000, null=True)
     device_type = models.TextField(null=True)
     os_version = models.CharField(max_length=20, null=True)
@@ -29,5 +32,10 @@ class DeviceAnalytics(models.Model):
     SpeedTestCount = models.IntegerField(null=True)
     TvShowCount = models.IntegerField(null=True)
     WordOftheDayCount = models.IntegerField(null=True)
+
+class PickupAnalytics(models.Model):
+    analytics = models.ForeignKey(DeviceAnalytics, on_delete=models.CASCADE, to_field='device_id')
+    pickup_data = models.ForeignKey(PickupData, on_delete=models.CASCADE, to_field='id')
+    count = models.IntegerField()
 
 
