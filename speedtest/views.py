@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.migrations import serializer
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
@@ -120,6 +121,7 @@ class SpeedTestView(APIView):
                         existing_device_id.save()
                 else:
                     device_analytics = DeviceAnalytics(**device_analytics)
+                    device_analytics_dict = model_to_dict(device_analytics)
                     device_analytics.save()
         else:
             ip_address = request.META.get('REMOTE_ADDR')
@@ -152,9 +154,10 @@ class SpeedTestView(APIView):
                         existing_device_id.save()
                 else:
                     device_analytics = DeviceAnalytics(**device_analytics)
+                    device_analytics_dict = model_to_dict(device_analytics)
                     device_analytics.save()
 
-        return JsonResponse(device_analytics, status=status.HTTP_201_CREATED)
+        return JsonResponse(device_analytics_dict, status=status.HTTP_201_CREATED)
 
 
     def get(self, request):
