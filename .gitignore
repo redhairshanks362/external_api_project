@@ -1,1 +1,5 @@
 images/
+/analytics/migrations/0003_alter_deviceanalytics_widget_family.py
+/analytics/migrations/0002_alter_deviceanalytics_factofthedaycount_and_more.py
+/analytics/migrations/0004_alter_deviceanalytics_device_id_pickupanalytics.py
+/analytics/migrations/0005_alter_pickupanalytics_pickup_data.py

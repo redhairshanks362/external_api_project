@@ -67,27 +67,7 @@ class Fetch(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.NasaCount is not None:
-                        existing_device_id.NasaCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.NasaCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
             if not date_param:
                 return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -118,27 +98,7 @@ class Fetch(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.NasaCount is not None:
-                        existing_device_id.NasaCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.NasaCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
             if not date_param:
                 return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -158,10 +118,27 @@ class Fetch(APIView):
             except NASAApod.DoesNotExist:
                 return Response({"error": "Data for the given date does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.NasaCount is not None:
+                    existing_device_id.NasaCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.NasaCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, NasaCount = 1)
+                device_analytics.save()
 
     def save_images(self, date, hdurl, url):
         # Create a directory structure based on the date

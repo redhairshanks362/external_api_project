@@ -1,9 +1,10 @@
 import json
 import random
+from collections import defaultdict
 
 import requests
-from django.db import transaction
-from django.db.models import F, Sum, Max
+from django.db import transaction, connection
+from django.db.models import F, Sum, Max, Subquery, OuterRef
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
@@ -79,45 +80,7 @@ class Rizz(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.PickupCount is not None:
-                        existing_device_id.PickupCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.PickupCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
-
-            all_the_pickup_id = PickupData.objects.values_list('id', flat=True)
-            random_id = random.choice(all_the_pickup_id)
-            random_pickup = PickupData.objects.get(id=random_id)
-            random_line = random_pickup.text
-            #random_line = "Are you cryptocurrency? Coz I wanna hold you for so long."
-
-            #Updating count for the specific pickup line
-            #First making a filter to check if the pickup line for the device id has a count if it does increase it by 1
-            pickup_entry = PickupAnalytics.objects.filter(pickup_data__text = random_line, analytics__device_id = device_id).first()
-            if pickup_entry:
-                PickupAnalytics.objects.filter(pk=pickup_entry.pk).update(count=F('count') + 1)
-            #Otherwise create a count for that and add it
-            else:
-                analytics_entry = DeviceAnalytics.objects.filter(device_id = device_id).first()
-                pickup_entry = PickupData.objects.filter(text=random_line).first()
-                if analytics_entry and pickup_entry:
-                    PickupAnalytics.objects.create(analytics = analytics_entry, pickup_data = pickup_entry, count = 1)
+            random_line = self.updatedDeviceAnalytics(device_analytics, device_id, widget_family)
             return Response(random_line, content_type='application/json', status=status.HTTP_201_CREATED)
 
         else:
@@ -131,47 +94,49 @@ class Rizz(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.PickupCount is not None:
-                        existing_device_id.PickupCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.PickupCount = 1
-                        existing_device_id.save()
-                        if existing_device_id.widget_family:
-                            existing_widget_family_list = existing_device_id.widget_family.split(',')
-                            if widget_family not in existing_widget_family_list:
-                                existing_device_id.widget_family += f',{widget_family}'
-                                existing_device_id.PickupCount += 1
-                                existing_device_id.save()
-                        else:
-                            existing_device_id.widget_family = widget_family
-                            existing_device_id.PickupCount += 1
-                            existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
-
-            all_the_pickup_id = PickupData.objects.values_list('id', flat=True)
-            random_id = random.choice(all_the_pickup_id)
-            random_pickup = PickupData.objects.get(id=random_id)
-            random_line = random_pickup.text
-            #random_line = "Are you cryptocurrency? Coz I wanna hold you for so long."
-            #Updating count for the specific pickup line
-            #First making a filter to check if the pickup line for the device id has a count if it does increase it by 1
-            pickup_entry = PickupAnalytics.objects.filter(pickup_data__text = random_line, analytics__device_id = device_id).first()
-            if pickup_entry:
-                PickupAnalytics.objects.filter(pk=pickup_entry.pk).update(count=F('count') + 1)
-            #Otherwise create a count for that and add it
-            else:
-                analytics_entry = DeviceAnalytics.objects.filter(device_id = device_id).first()
-                pickup_entry = PickupData.objects.filter(text=random_line).first()
-                if analytics_entry and pickup_entry:
-                    PickupAnalytics.objects.create(analytics = analytics_entry, pickup_data = pickup_entry, count = 1)
+            random_line = self.updatedDeviceAnalytics(device_analytics, device_id, widget_family)
             return Response(random_line, content_type='application/json', status=status.HTTP_201_CREATED)
+
+    def updatedDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.PickupCount is not None:
+                    existing_device_id.PickupCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.PickupCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, PickupCount = 1)
+                device_analytics.save()
+        all_the_pickup_id = PickupData.objects.values_list('id', flat=True)
+        random_id = random.choice(all_the_pickup_id)
+        random_pickup = PickupData.objects.get(id=random_id)
+        random_line = random_pickup.text
+        # random_line = "Are you cryptocurrency? Coz I wanna hold you for so long."
+        # Updating count for the specific pickup line
+        # First making a filter to check if the pickup line for the device id has a count if it does increase it by 1
+        pickup_entry = PickupAnalytics.objects.filter(pickup_data__text=random_line,
+                                                      analytics__device_id=device_id).first()
+        if pickup_entry:
+            PickupAnalytics.objects.filter(pk=pickup_entry.pk).update(count=F('count') + 1)
+        # Otherwise create a count for that and add it
+        else:
+            analytics_entry = DeviceAnalytics.objects.filter(device_id=device_id).first()
+            pickup_entry = PickupData.objects.filter(text=random_line).first()
+            if analytics_entry and pickup_entry:
+                PickupAnalytics.objects.create(analytics=analytics_entry, pickup_data=pickup_entry, count=1)
+        return random_line
+
 
 #This is working
 class MostViewedbyAll(APIView):
@@ -214,46 +179,76 @@ class MostViewedbyAll(APIView):
                 num_devices = num_devices_with_count
                 return most_viewed_pickup_line, highest_count
 
-
+#Not Working
 class MostViewedbyDevice(APIView):
 
     def get(self,request):
-        most_viewed_by_device = self.find_most_viewed_pickup_line_by_device()
-        response_data = []
+        #pickup_data_ids = self.most_viewed_pickup_line_by_device()
+        '''
+        sql_query = """
+        SELECT analytics_id, pickup_data_id,count
+        FROM analytics_pickupanalytics
+        WHERE (analytics_id, count) IN (
+            SELECT analytics_id, MAX(count)
+            FROM analytics_pickupanalytics
+            GROUP BY analytics_id
+        );
+        """
+        '''
+        sql_query= """
+        SELECT analytics_pickupanalytics.analytics_id, analytics_pickupanalytics.pickup_data_id, analytics_pickupanalytics.count, pickup_pickupdata.text
+        FROM analytics_pickupanalytics
+        INNER JOIN pickup_pickupdata ON analytics_pickupanalytics.pickup_data_id = pickup_pickupdata.id
+        WHERE (analytics_pickupanalytics.analytics_id, analytics_pickupanalytics.count) IN (
+            SELECT analytics_id, MAX(count)
+        FROM analytics_pickupanalytics
+        GROUP BY analytics_id
+        );
+        """
 
-        for device_id, data in most_viewed_by_device.items():
-            pickup_line = data['pickup_line']
-            count = data['count']
-            response_data.append({
-                'device_id': device_id,
-                'pickup_line': pickup_line,
-                'count': count
-            })
+        with connection.cursor() as cursor:
+            # Execute the SQL query
+            cursor.execute(sql_query)
 
-        return Response(response_data)
+            # Fetch all rows from the result set
+            results = cursor.fetchall()
 
-    def find_most_viewed_pickup_line_by_device(self):
-        device_pickup_lines = (
-            PickupAnalytics.objects
-            .values('analytics__device_id', 'pickup_data__text')
-            .annotate(max_count=Max('count'))
-        )
+        # Prepare the results as a list of dictionaries
+        response_data = [{'device_id': row[0], 'pickup_line': row[3]} for row in results]
 
-        most_viewed_by_device = {}
+        # max_counts = PickupAnalytics.objects.filter(
+        #     analytics_id=OuterRef('analytics_id')
+        # ).values('analytics_id').annotate(max_count=Max('count')).values('max_count')
+        #
+        # # Query to get the desired result
+        # result = PickupAnalytics.objects.filter(
+        #     count=Subquery(max_counts),
+        #     analytics_id=OuterRef('analytics_id')
+        # ).values(
+        #     'analytics_id',
+        #     'pickup_data_id',
+        #     'count',
+        #     'pickup_data__text'  # Accessing the text field of the related PickupData model
+        # )
 
-        for record in device_pickup_lines:
-            device_id = record['analytics__device_id']
-            pickup_line = record['pickup_data__text']
-            count = record['max_count']
 
-            if device_id in most_viewed_by_device:
-                if count > most_viewed_by_device[device_id]['count']:
-                    most_viewed_by_device[device_id] = {'Pickup Line': pickup_line, 'Count': count}
-            else:
-                most_viewed_by_device[device_id] = {'Pickup Line': pickup_line, 'Count': count}
+        # Return the results as JSON response
+        return JsonResponse(response_data, safe=False)
+        #return Response(pickup_data_ids, content_type='application/json', status=status.HTTP_200_OK)
 
-        return most_viewed_by_device
+    '''
+    def most_viewed_pickup_line_by_device(request):
+        subquery = PickupAnalytics.objects.values('analytics_id').annotate(
+            max_count=Max('count')
+        ).values('analytics_id', 'max_count')
 
+        pickup_data_ids = PickupAnalytics.objects.filter(
+            analytics_id__in=Subquery(subquery.values('analytics_id')),
+            count=Subquery(subquery.values('max_count'))
+        ).values('analytics_id', 'pickup_data_id', 'count')
+
+        return pickup_data_ids
+    '''
 
 
 
