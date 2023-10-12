@@ -26,7 +26,7 @@ class NumberAPI(APIView):
         os_version = request.data.get('os_version')
         device_id = request.data.get('device_id')
         widget_family = request.data.get('widget_family')
-        #H
+
 
         number_api_url = f"{base_url}/factoftheDay/{month}/{day}/date"
 
@@ -38,27 +38,7 @@ class NumberAPI(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.FactofTheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
             if not (1 <= month <= 12) or not (1 <= day <= 31):
                 return Response({"error": "Invalid month or date"}, status=status.HTTP_400_BAD_REQUEST)
@@ -82,27 +62,7 @@ class NumberAPI(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.FactofTheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             if not (1 <= month <= 12) or not (1 <= day <= 31):
                 return Response({"error": "Invalid month or date"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -113,6 +73,28 @@ class NumberAPI(APIView):
                 return HttpResponse(fact_text, content_type="text/plain")
             else:
                 return Response({"error": "Data for the given month and date does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.FactofTheDayCount is not None:
+                    existing_device_id.FactofTheDayCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.FactofTheDayCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, FactofTheDayCount = 1)
+                device_analytics.save()
 
 
 

@@ -35,7 +35,7 @@ class DeviceAnalytics(models.Model):
 
 class PickupAnalytics(models.Model):
     analytics = models.ForeignKey(DeviceAnalytics, on_delete=models.CASCADE, to_field='device_id')
-    pickup_data = models.ForeignKey(PickupData, on_delete=models.CASCADE, to_field='id')
+    pickup_data = models.ForeignKey(PickupData, on_delete=models.CASCADE)
     count = models.IntegerField()
 
 

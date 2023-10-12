@@ -45,27 +45,7 @@ class fetchQuotesWithLimit(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.TvShowCount is not None:
-                        existing_device_id.TvShowCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.TvShowCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             #Working
             if show is None and short is None:
                 number = kwargs.get('number')
@@ -128,27 +108,7 @@ class fetchQuotesWithLimit(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.FactofTheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             if show is None and short is None:
                 number = kwargs.get('number')
                 try:
@@ -201,6 +161,29 @@ class fetchQuotesWithLimit(APIView):
                 except TVShow.DoesNotExist:
                     return Response({"error": "TV show does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.TvShowCount is not None:
+                    existing_device_id.TvShowCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.TvShowCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, TvShowCount = 1)
+                device_analytics.save()
+
+
 class fetchQuotes(APIView):
     def post(self, request, *args,**kwargs):
         host = request.get_host()
@@ -229,28 +212,8 @@ class fetchQuotes(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.TvShowCount is not None:
-                        existing_device_id.TvShowCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.TvShowCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
-        #Working
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
+            #Working
             if short is None and show is None:
                 print('kwargs',kwargs)
                 print('args',args)
@@ -297,27 +260,7 @@ class fetchQuotes(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.FactofTheDayCount is not None:
-                        existing_device_id.FactofTheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.FactofTheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             if short is None and show is None:
                 print('kwargs',kwargs)
                 print('args',args)
@@ -352,3 +295,25 @@ class fetchQuotes(APIView):
 
                 except ValueError:
                     return Response({"error": "Invalid show or short value"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.TvShowCount is not None:
+                    existing_device_id.TvShowCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.TvShowCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, TvShowCount = 1)
+                device_analytics.save()

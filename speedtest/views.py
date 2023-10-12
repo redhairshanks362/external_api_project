@@ -101,28 +101,8 @@ class SpeedTestView(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.SpeedTestCount is not None:
-                        existing_device_id.SpeedTestCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.SpeedTestCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics_dict = model_to_dict(device_analytics)
-                    device_analytics.save()
+            #device_analytics_dict = self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
         else:
             ip_address = request.META.get('REMOTE_ADDR')
             Location = DbIpCity.get(ip_address, api_key='free')
@@ -134,31 +114,34 @@ class SpeedTestView(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+            #device_analytics_dict = self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.SpeedTestCount is not None:
-                        existing_device_id.SpeedTestCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.SpeedTestCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
+        return JsonResponse(device_analytics, status=status.HTTP_201_CREATED)
+
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.SpeedTestCount is not None:
+                    existing_device_id.SpeedTestCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.SpeedTestCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
                         existing_device_id.save()
                 else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics_dict = model_to_dict(device_analytics)
-                    device_analytics.save()
-
-        return JsonResponse(device_analytics_dict, status=status.HTTP_201_CREATED)
-
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, SpeedTestCount = 1)
+                #device_analytics_dict = model_to_dict(device_analytics)
+                device_analytics.save()
+        return device_analytics
 
     def get(self, request):
         speedtest_instances = SpeedTest.objects.all()

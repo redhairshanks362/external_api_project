@@ -33,27 +33,7 @@ class wordOfTheDay(APIView):
                 'widget_family' : widget_family,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.WordOftheDayCount is not None:
-                        existing_device_id.WordOftheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.WordOftheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
             try:
                 current_date = date.today()
@@ -84,30 +64,11 @@ class wordOfTheDay(APIView):
                 'country' : country,
             }
 
-            existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
-            #H
-            with transaction.atomic():
-                if existing_device_id:
-                    if existing_device_id.WordOftheDayCount is not None:
-                        existing_device_id.WordOftheDayCount += 1
-                        existing_device_id.save()
-                    else:
-                        existing_device_id.WordOftheDayCount = 1
-                        existing_device_id.save()
-                    if existing_device_id.widget_family:
-                        existing_widget_family_list = existing_device_id.widget_family.split(',')
-                        if widget_family not in existing_widget_family_list:
-                            existing_device_id.widget_family += f',{widget_family}'
-                            existing_device_id.save()
-                    else:
-                        existing_device_id.widget_family = widget_family
-                        existing_device_id.save()
-                else:
-                    device_analytics = DeviceAnalytics(**device_analytics)
-                    device_analytics.save()
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
 
             try:
                 current_date = date.today()
+                #current_date = '2023-10-04'
                 date_string = str(current_date)
                 valid_date = datetime.strptime(date_string, '%Y-%m-%d').date()
 
@@ -123,3 +84,25 @@ class wordOfTheDay(APIView):
 
             except ValueError:
                 return Response({"error": "Invalid date format. Please use 'YYYY-MM-DD' format."}, status=status.HTTP_400_BAD_REQUEST)
+
+    def updateDeviceAnalytics(self, device_analytics, device_id, widget_family):
+        existing_device_id = DeviceAnalytics.objects.filter(device_id=device_id).first()
+        with transaction.atomic():
+            if existing_device_id:
+                if existing_device_id.WordOftheDayCount is not None:
+                    existing_device_id.WordOftheDayCount += 1
+                    existing_device_id.save()
+                else:
+                    existing_device_id.WordOftheDayCount = 1
+                    existing_device_id.save()
+                if existing_device_id.widget_family:
+                    existing_widget_family_list = existing_device_id.widget_family.split(',')
+                    if widget_family not in existing_widget_family_list:
+                        existing_device_id.widget_family += f',{widget_family}'
+                        existing_device_id.save()
+                else:
+                    existing_device_id.widget_family = widget_family
+                    existing_device_id.save()
+            else:
+                device_analytics = DeviceAnalytics(**device_analytics, WordOftheDayCount = 1)
+                device_analytics.save()
