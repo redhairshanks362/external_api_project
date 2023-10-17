@@ -46,6 +46,7 @@ The `getNASA` API allows you to retrieve NASA's Astronomy Picture of the Day (AP
 The response will be a JSON object containing data specific to the requested date.
 
 ##### Example
+```json
 {
     "id": 7607,
     "date": "2000-03-06",
@@ -58,6 +59,7 @@ The response will be a JSON object containing data specific to the requested dat
     "hd_image": null,
     "standard_image": null
 }
+```
 
 ## Speed Test API
 
