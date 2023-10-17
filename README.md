@@ -90,19 +90,101 @@ The `getTVQuotes` API allows you to retrieve quotes from various TV shows. It of
 
 - **GET** `/getTVQuotes/quotes`
   
-  This endpoint fetches a random TV show quote.
+#### Response
+
+This endpoint fetches a random TV show quote from db.
+
+##### Example
+```json
+{
+    "show": "The Middle",
+    "character": "Frankie",
+    "text": "Frankie: [v.o.] I read something somewhere about: \"No matter how dark the night, the sun comes up... ...and something, something.\" Anyway, the sun came up, and it sure didn't make that room look any better."
+}
+```
 
 - **GET** `/getTVQuotes/quotes/{number}`
 
   This endpoint fetches a specified number of random TV show quotes. You can customize the number of quotes to retrieve.
 
-- **GET** `/getTVQuotes/quotes?show={show_name}&short={true/false}`
-
+#### Response
   This endpoint allows you to filter quotes by specifying the TV show name and whether you want short or full quotes.
 
-- **GET** `/getTVQuotes/quotes/{number}?show={show_name}&short={true/false}`
+##### Example
+```json
+[
+    {
+        "show": "Brooklyn Nine-Nine",
+        "character": "Hitchcock",
+        "text": "Hitchcock: I got it. No! My ass. It left the chair.\nScully: I'm sorry, man.\nHitchcock: No. It was my time."
+    },
+    {
+        "show": "Lucifer",
+        "character": "Lucifer Morningstar",
+        "text": "Lately I've been thinking. Do you think I'm the Devil because I'm inherently evil, or just because dear ol' dad decided I was?"
+    },
+    {
+        "show": "The Office",
+        "character": "Michael Scott",
+        "text": "Michael Scott: Cold front coming into the warehouse! Better put on your ski boots! Happy New Year, Darryl. Hey, Darryl. You ever done this?"
+    }
+]
+```
 
+- **GET** `/getTVQuotes/quotes?show={show_name}&short={true/false}`
+
+#### Response
+  This endpoint allows you to filter quotes by specifying the TV show name and whether you want short or full quotes.
+
+##### Example
+```json
+{
+    "id": 327,
+    "show": "Frasier",
+    "character": "Martin",
+    "text": "Daphne: I just thought this would be the first child for both of us. You could be a daddy already. There could be dozens of little Niles Cranes running around. He could be your son. Or him.\nNiles: Oh, please, they look nothing like me. Besides, I only went down there one time. It's possible they never used my sample.\n[An extremely handsome blonde-haired man with an incredible physique comes over to the table] \nMan: Can I borrow your sugar?\nDaphne: Yeah.\nNiles: [watching the man walk away] I better look into this.",
+    "short": "false"
+}
+```
+
+- **GET** `/getTVQuotes/quotes/{number}?show={show_name}&short={true/false}`
+- 
+#### Response
   This endpoint combines the features of specifying the number of quotes, TV show name, and short/full format.
+##### Example
+```json
+[
+    {
+        "id": 82,
+        "show": "Frasier",
+        "character": "Niles",
+        "text": "Niles: Dad, are you sure you want to do this? I spoke at a career day once. It was a disaster. All the taunting and yelling, I haven't been so... I haven't been so afraid of third graders since ninth grade.",
+        "short": "true"
+    },
+    {
+        "id": 77,
+        "show": "Frasier",
+        "character": "Niles",
+        "text": "Niles: Oh, this one's from your mom. A kitten in a basket of yarn. [opens reads the card] \"Dear Niles, I know we haven't always gotten along...\" [checks the other side, but nothing] Wasn't that sweet of her?",
+        "short": "true"
+    },
+    {
+        "id": 83,
+        "show": "Frasier",
+        "character": "Frasier",
+        "text": "Frasier: Oh, great. Oh, thank God. By tonight my dad will be safely back in his beer-stained, flea-infested, duct-taped recliner, adjusting his shorts with one hand and cheering on Jean-Claude van Damme with the other. Yes, it's quite a little piece of heaven I've carved out for myself, isn't it?",
+        "short": "true"
+    },
+    {
+        "id": 84,
+        "show": "Frasier",
+        "character": "Niles",
+        "text": "Niles: Yes, well. This has been delightful, but I really must run. I'm due at my sexual addiction group, and I don't like to leave them alone for too long.",
+        "short": "true"
+    }
+]
+```
+  
 
   
 
