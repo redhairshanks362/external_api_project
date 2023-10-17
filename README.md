@@ -65,10 +65,6 @@ The response will be a plain text string that contains the most viewed pickup li
 ##### Example
 "The most viewed pickup line by all devices is 'Are you cryptocurrency? Coz I wanna hold you for so long.' with a count of 5."
 
-
-
-
-
 ## NASA API
 
 The `getNASA` API allows you to retrieve NASA's Astronomy Picture of the Day (APOD) for a specific date.
@@ -222,8 +218,46 @@ This endpoint fetches a random TV show quote from db.
 ]
 ```
 
-
+## Numbers API
+The `factoftheDay/{month_in_number_format}/{day_in_number_format}/date` API allows you to retrieve a fact of the day from the database for a specific date.Please note that while the day and month are fixed, the year is variable and can be any year. This means you can retrieve a fact for the same day and month across different years.
   
+### Retrieve a Random Pickup Line
+
+- **GET** `factoftheDay/11/2/date`
+
+#### Response
+
+The response will be a plain text string containing a fact of the day for that date. 
+
+##### Example
+"November 2nd is the day in 1930 that Haile Selassie is crowned emperor of Ethiopia."
+
+## Word of the Day API
+The `wordOftheDay/` API returns the word of the day for today's date in both Hindi and English, along with usage examples in both languages.
+  
+### Retrieve a Random Pickup Line
+
+- **GET** `wordOftheDay/`
+
+#### Response
+
+The response will return a JSON response of word of the day data for today's date in both Hindi and English, along with usage examples in both languages. 
+
+##### Example
+```json
+{
+    "id": 43,
+    "wordOfTheDayinHindi": "अस्पष्ट",
+    "wordOfTheDayinEnglish": "ambiguous",
+    "wordOfTheDayinEnglish_Usage_Example": "Everyone listened to the weather report, but the forecast was ambiguous and no one knew if it was going to be rainy or sunny today.",
+    "wordOfTheDayinHindi_Usage_Example": "हर किसी ने मौसम के समाचार को सुना था, लेकिन उनका पूर्वानुमान अस्पष्ट था और कोई भी यह नहीं जान पाया कि आज बरसात होगी या धूप खिलेगी।",
+    "date": "2023-10-17"
+}
+```
+
+
+
+
 
   
 
