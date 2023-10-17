@@ -16,11 +16,18 @@ To retrieve a random image, make a GET request to the `/image/` endpoint.
 
 ## Pickup API
 
-The `getPickup` API allows you to retrieve a random pickup line. It uses external APIs to fetch pickup lines, stores them in a database, and returns a random pickup line to the user.
+The `getPickup/getRandomRizz` API allows you to retrieve a random pickup line from the database and return a random pickup line to the user.
 
 ### Retrieve a Random Pickup Line
 
-- **GET** `/getPickup/`
+- **GET** `/getPickup/getRandomRizz/`
+
+#### Response
+
+The response will be a plain text string containing a random pickup line. 
+
+##### Example
+"My favorite element on the periodic table is Uranium, because I am in love with U."
 
 ## NASA API
 
