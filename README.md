@@ -15,7 +15,6 @@ This API allows you to retrieve a random image from a predefined directory and t
 To retrieve a random image, make a GET request to the `/image/` endpoint.
 
 ## Pickup API
-
 The `getPickup/getRandomRizz` API allows you to retrieve a random pickup line from the database and return a random pickup line to the user.
 
 ### Retrieve a Random Pickup Line
@@ -28,6 +27,47 @@ The response will be a plain text string containing a random pickup line.
 
 ##### Example
 "My favorite element on the periodic table is Uranium, because I am in love with U."
+
+- **GET** `/getPickup/getMostViewedLine/`
+
+#### Response
+
+The response will return the most viewed pickup line for each device, mentioning the device ID and the respective pickup line.
+
+##### Example
+```json
+[
+    {
+        "device_id": "2d4d9f1868ed11ee8c990242ac120002",
+        "pickup_line": "My favorite element on the periodic table is Uranium, because I am in love with U."
+    },
+    {
+        "device_id": "6d9b85045eed424eaf2efbc96cd8e9a3",
+        "pickup_line": "Are you a camera? Because every time I see you I smile"
+    },
+    {
+        "device_id": "6d9b85045eed424eaf2efbc96cd8e9a9",
+        "pickup_line": "Are you cryptocurrency? Coz I wanna hold you for so long."
+    },
+    {
+        "device_id": "6d9b85045eed424eaf2efbc96cd8e9c3",
+        "pickup_line": "Was your father a thief? Because someone stole the stars from the sky and put them in your eyes."
+    },
+]
+```
+
+- **GET** `/getPickup/getMostViewedAll/`
+
+#### Response
+
+The response will be a plain text string that contains the most viewed pickup line across all devices.
+
+##### Example
+"The most viewed pickup line by all devices is 'Are you cryptocurrency? Coz I wanna hold you for so long.' with a count of 5."
+
+
+
+
 
 ## NASA API
 
@@ -105,10 +145,8 @@ This endpoint fetches a random TV show quote from db.
 
 - **GET** `/getTVQuotes/quotes/{number}`
 
-  This endpoint fetches a specified number of random TV show quotes. You can customize the number of quotes to retrieve.
-
 #### Response
-  This endpoint allows you to filter quotes by specifying the TV show name and whether you want short or full quotes.
+   This endpoint fetches a specified number of random TV show quotes. You can customize the number of quotes to retrieve.
 
 ##### Example
 ```json
@@ -148,7 +186,6 @@ This endpoint fetches a random TV show quote from db.
 ```
 
 - **GET** `/getTVQuotes/quotes/{number}?show={show_name}&short={true/false}`
-- 
 #### Response
   This endpoint combines the features of specifying the number of quotes, TV show name, and short/full format.
 ##### Example
@@ -184,6 +221,8 @@ This endpoint fetches a random TV show quote from db.
     }
 ]
 ```
+
+
   
 
   
