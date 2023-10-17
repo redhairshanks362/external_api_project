@@ -41,6 +41,24 @@ The `getNASA` API allows you to retrieve NASA's Astronomy Picture of the Day (AP
 
 - `date` (required): The date for which you want to retrieve the APOD image. It should be in the format `YYYY-MM-DD`.
 
+#### Response
+
+The response will be a JSON object containing data specific to the requested date.
+
+##### Example
+{
+    "id": 7607,
+    "date": "2000-03-06",
+    "explanation": "Over the course of billions of years, whole clusters of galaxies merge.  Above is an X-ray image of Abell 2142, the result of the collision of two huge clusters of galaxies, and one of the most massive objects known in the universe.  This false-color image shows a concentration of gas 50 million degrees hot near the center of the resulting cluster.  Oddly, it is the relative coldness of the gas that makes this situation particularly interesting.  The center of Abell 2142 is surrounded by gas fully twice as hot, a temperature thought to have been created by energy released during the colossal collision.  Still, since we can only see a snapshot in time, much remains unknown about how clusters of galaxies form and coalesce.",
+    "hdurl": "https://apod.nasa.gov/apod/image/0003/abell2142_chandra_big.jpg",
+    "media_type": "image",
+    "service_version": "v1",
+    "title": "Abell 2142: Clash of the Galaxy Clusters",
+    "url": "https://apod.nasa.gov/apod/image/0003/abell2142_chandra.jpg",
+    "hd_image": null,
+    "standard_image": null
+}
+
 ## Speed Test API
 
 The `speed_test` API allows you to perform a network speed test and record the results, including the speed, date and time of the test, binary URL, device information, and system version.
