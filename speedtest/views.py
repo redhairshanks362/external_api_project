@@ -1,3 +1,4 @@
+import socket
 from django.db import transaction
 from django.db.migrations import serializer
 from django.forms import model_to_dict
@@ -104,15 +105,16 @@ class SpeedTestView(APIView):
             #device_analytics_dict = self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
         else:
-            ip_address = request.META.get('REMOTE_ADDR')
-            Location = DbIpCity.get(ip_address, api_key='free')
-            city = Location.city
-            country = Location.country
-            device_analytics = {
-                'ip' : ip_address,
-                'city' : city,
-                'country' : country,
-            }
+            client_ipv4 = self.get_client_ipv4(request)
+            if client_ipv4:
+                Location = DbIpCity.get(client_ipv4, api_key='free')
+                city = Location.city
+                country = Location.country
+                device_analytics = {
+                    'ip' : client_ipv4,
+                    'city' : city,
+                    'country' : country,
+                }
 
             #device_analytics_dict = self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
             self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
@@ -148,6 +150,26 @@ class SpeedTestView(APIView):
         data = serializers.serialize('json', speedtest_instances)
         serializer = STSerializers(speedtest_instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_client_ipv4(self,request):
+        # Check the 'HTTP_X_FORWARDED_FOR' header for the client's IP address
+        forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+        if forwarded_for:
+            # The 'HTTP_X_FORWARDED_FOR' header can contain multiple IP addresses;
+            # the client's address is typically the first one
+            client_ip = forwarded_for.split(',')[0]
+        else:
+            # If 'HTTP_X_FORWARDED_FOR' is not available, fall back to 'REMOTE_ADDR'
+            client_ip = request.META.get('REMOTE_ADDR')
+
+        # Ensure the address is a valid IPv4 address
+        try:
+            socket.inet_pton(socket.AF_INET, client_ip)
+            return client_ip
+        except socket.error:
+            # The address is not a valid IPv4 address
+            return None
 
 """
 # def getGeoLoc(ipaddr, user):

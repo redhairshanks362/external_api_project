@@ -8,7 +8,7 @@ class TVShow(models.Model):
     # stats = models.TextField(max_length=500)
     character = models.TextField(max_length=200)
     text = models.TextField(max_length=10000)
-    short = models.TextField()
+    short = models.TextField(default=False)
     # total = models.TextField(max_length=500)
     #number = models.TextField(max_length=500)
     # shows = models.TextField(max_length=200)

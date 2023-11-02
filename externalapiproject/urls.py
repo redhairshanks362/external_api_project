@@ -24,7 +24,7 @@ from numbers_api import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('getNASA', include('base.urls')),
+    path('getNASA/', include('base.urls')),
     path('speed_test/', include('speedtest.urls')),
     path('getPickup/', include('pickup.urls')),
     path('getTVQuotes/', include('tvshow.urls')),
