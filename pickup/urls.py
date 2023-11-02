@@ -1,6 +1,6 @@
 from django.urls import path
 
-from pickup.views import Rizz, MostViewedbyAll, MostViewedbyDevice
+from pickup.views import Rizz, MostViewedbyAll, MostViewedbyDevice, GetPickupLine_UnitTest, Analytics_UnitTest
 from .import views
 #from .views import Fetch
 
@@ -16,6 +16,8 @@ urlpatterns = [
     path('getRandomRizz/', Rizz.as_view()),
     path('getMostViewedLine/',MostViewedbyDevice.as_view()),
     path('getMostViewedAll/',MostViewedbyAll.as_view()),
+    path('getUnitTest/',GetPickupLine_UnitTest.as_view()),
+    path('postUnitTest/', Analytics_UnitTest.as_view()),
     #path('ipad/', SpeedTestView.as_view(), name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),
     #path('', Demo.as_view()),

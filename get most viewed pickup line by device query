@@ -1,0 +1,8 @@
+SELECT analytics_pickupanalytics.analytics_id, analytics_pickupanalytics.pickup_data_id, analytics_pickupanalytics.count, pickup_pickupdata.text
+FROM analytics_pickupanalytics
+INNER JOIN pickup_pickupdata ON analytics_pickupanalytics.pickup_data_id = pickup_pickupdata.id
+WHERE (analytics_pickupanalytics.analytics_id, analytics_pickupanalytics.count) IN (
+    SELECT analytics_id, MAX(count)
+    FROM analytics_pickupanalytics
+    GROUP BY analytics_id
+);

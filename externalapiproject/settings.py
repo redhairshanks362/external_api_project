@@ -30,7 +30,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ["*"] if DEBUG else ['192.168.0.186', '127.0.0.1', '5221-219-91-170-183.ngrok-free.app',
-                                             'https://5413-123-201-214-38.ngrok-free.app']
+                                             'https://5413-123-201-214-38.ngrok-free.app','https://ab1b-123-201-215-246.ngrok-free.app']
 environ.Env.read_env()
 
 
@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'wordOfTheDay',
     'analytics',
 ]
+
 
 # Celery Configuration
 #from celery import Celery

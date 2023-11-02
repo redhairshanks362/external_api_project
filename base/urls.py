@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 
 from pickup.views import Rizz
 from .import views
-from .views import Fetch
+from .views import Fetch, Analytics_UnitTest, GetNasa_UnitTest
 
 from speedtest import views
 #from speedtest.views import get_client_ip
@@ -15,6 +15,8 @@ from speedtest.views import SpeedTestView
 
 urlpatterns = [
     path('', Fetch.as_view()),
+    path('getUnitTest/', GetNasa_UnitTest.as_view()),
+    path('postUnitTest/', Analytics_UnitTest.as_view()),
     #path('rizz/', Rizz.as_view()),
     #path('ipad/', SpeedTestView.as_view(), name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),

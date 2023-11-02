@@ -1,0 +1,7 @@
+SELECT analytics_id, pickup_data_id,count
+FROM analytics_pickupanalytics
+WHERE (analytics_id, count) IN (
+    SELECT analytics_id, MAX(count)
+    FROM analytics_pickupanalytics
+    GROUP BY analytics_id
+);

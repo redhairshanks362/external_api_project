@@ -23,10 +23,10 @@ app.conf.beat_schedule = {
         'task': 'pickup.tasks.fetch_and_save_pickup_lines',
         'schedule': crontab(hour='*/1',minute='15')
 },
-'initiate_web_scraping': {
-        'task': 'wordOfTheDay.tasks.initiate_web_scraping',
-        'schedule': crontab(hour='*/5')
-},
+# 'initiate_web_scraping': {
+#         'task': 'wordOfTheDay.tasks.initiate_web_scraping',
+#         'schedule': crontab(hour='*/5')
+# },
 'fetch_and_save_nasa_data' : {
         'task': 'base.tasks.fetch_and_save_nasa_data',
         'schedule': crontab(minute='*/5')
