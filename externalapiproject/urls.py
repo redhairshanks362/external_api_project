@@ -32,6 +32,7 @@ urlpatterns = [
     path('wallpapers/', include('pictures.urls')),
     path('factoftheDay/', include('numbers_api.urls')),
     path('wordOftheDay/', include('wordOfTheDay.urls')),
+    #path('users/', include('users.urls')),
     #path('', include('speedtest.urls')),
     #path('ipad/', views.ipaddress, name='ipaddress'),
     #path('geo/', views.getGeoLoc, name='geoloc'),

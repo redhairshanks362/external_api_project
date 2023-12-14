@@ -17,8 +17,9 @@ from django.core import serializers
 from analytics.models import DeviceAnalytics
 from speedtest.models import SpeedTest
 from speedtest.serializers import STSerializers
+from rest_framework.throttling import UserRateThrottle
 import speedtest
-
+from rest_framework.throttling import ScopedRateThrottle
 
 # Create your views here.
 '''
@@ -71,6 +72,32 @@ def ipaddress(request):
     return Response(response_data, status=status.HTTP_201_CREATED)\
 '''
 #H
+#We have to add custom throttle to limit requests from a specific ip address
+#We will create a new class and then call that custom throttle in the speedtestview
+
+# class CustomThrottle(UserRateThrottle):
+#     rate = '5/day'
+#
+#     def allow_request(self, request, view):
+#         device_id = request.data.get['device_id']
+#         # Get the IP address of the client
+#         ip_address = self.get_ident(request)
+#
+#         # Check if the client has exceeded the rate limit
+#         if device_id:
+#             self.rate = f'{device_id}:5/day'
+#         else:
+#             self.rate = f'{ip_address}:5/day'
+#
+#         if self.get_rate_remaining(ip_address) <= 0:
+#             return False
+#
+#         if self.get_rate_remaining(device_id) <= 0:
+#             return False
+#
+#         # Allow the request
+#         return True
+
 
 
 class SpeedTestView(APIView):
@@ -80,6 +107,10 @@ class SpeedTestView(APIView):
     #platforms like postman to underdtand what are we doing
     #And in urls.py only the class based view is called its not like we have called each method over there
     '''
+    #throttle_classes = [UserRateThrottle]
+    #throttle_classes = [CustomThrottle]
+    throttle_scope = 'speedtest'
+    throttle_classes = (ScopedRateThrottle,)
     def post(self, request):
         device_type = request.data.get('device_type')
         os_version = request.data.get('os_version')

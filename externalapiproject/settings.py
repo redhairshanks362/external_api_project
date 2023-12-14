@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from datetime import datetime
+
 import environ
 from pathlib import Path
 from environ import ImproperlyConfigured
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -87,6 +90,26 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    #To enable User Rate Throttle we have to use DEFAULT AUTHENTICATION CLASSES
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+      'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        #'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        #Anon (AnonRateThrottle) uses the ip address of the incoming request as unique key is generated to throttle against (This works per API request so if I use SpeedTest more that 2 times I will get error, Then I can use NASA more than 2 times it will throw error)
+        #'anon': '2/minute',
+        'speedtest': '2/minute',
+        'nasa': '1/minute',
+        #'user': '4/day',
+        #'5/10s': '5/10s',
+        #'5/day': '5/day',
+    }
+}
 
 ROOT_URLCONF = 'externalapiproject.urls'
 

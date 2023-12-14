@@ -11,6 +11,7 @@ from PIL import Image
 # Create your views here.
 import requests
 from ip2geotools.databases.noncommercial import DbIpCity
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -30,6 +31,8 @@ from django.http import JsonResponse
 
 #H
 class Fetch(APIView):
+    throttle_scope = 'nasa'
+    throttle_classes = (ScopedRateThrottle,)
     def post(self, request, **kwargs):
         '''
         date_param = request.query_params.get('date')  # Get the date from query parameter
@@ -69,7 +72,7 @@ class Fetch(APIView):
                 'widget_family' : widget_family,
             }
 
-            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)
+            self.updateDeviceAnalytics(device_analytics, device_id, widget_family)s
 
             if not date_param:
                 return Response({"error": "Date parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
